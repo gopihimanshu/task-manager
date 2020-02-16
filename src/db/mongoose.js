@@ -6,15 +6,3 @@ mongoose.connect(connectionURL, { useNewUrlParser: true, useCreateIndex: true })
 
 // Stop to Pluralize the model name 
 mongoose.pluralize(null);
-
-const Task = mongoose.model('Task', {
-    description: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    completed: {
-        type: Boolean,
-        default: false
-    }
-});
