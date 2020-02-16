@@ -6,7 +6,7 @@ const connectionURL = 'mongodb://127.0.0.1:27017/task-manager-api';
 mongoose.connect(connectionURL, {
     useNewUrlParser: true,
     useCreateIndex: true
-})
+});
 
 // Stop to Pluralize the model name 
 mongoose.pluralize(null);
@@ -40,44 +40,47 @@ const User = mongoose.model('User', {
     password: {
         type: String,
         required: true,
+        trim: true,
         minlength: 6,
-        maxlength: 10,
         validate(value){
-            if (validator.isLength(value, {min:8, max: 16})) {
-                throw new Error('Password must be greater than 8 character and less than 16 character')
+            if (validator.contains(value, 'password')) {
+                throw new Error('Password must be greater than 6 character and does not contains word password')
             }
         }
     }
 });
 
-const me = new User({
-    name: '  Himanshu    ',
-    email: 'gopi@gmail.com',
-    password: 'hello'
-});
-
-me.save().then((me) => {
-    console.log(me);
-}).catch((error) => {
-    console.log(error);
-});
-
-// const Task = mongoose.model('Task', {
-//     description: {
-//         type: String
-//     },
-//     completed: {
-//         type: Boolean
-//     }
+// const me = new User({
+//     name: '  Himanshu    ',
+//     email: '    gopi@gmail.com',
+//     password: ' hello  world   '
 // });
 
-// const task = new Task({
-//     description: 'Clean the Kitchen',
-//     completed: true
-// });
-
-// task.save().then((task) => {
-//     console.log(task)
+// me.save().then((me) => {
+//     console.log(me);
 // }).catch((error) => {
-//     console.log(error)
+//     console.log(error);
 // });
+
+const Task = mongoose.model('Task', {
+    description: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    completed: {
+        type: Boolean,
+        default: false
+    }
+});
+
+const task = new Task({
+    description: 'Eat Lunch   ',
+    completed: true
+});
+
+task.save().then((task) => {
+    console.log(task)
+}).catch((error) => {
+    console.log(error)
+});
