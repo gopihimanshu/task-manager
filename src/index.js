@@ -2,7 +2,6 @@ const express = require('express');
 require('./db/mongoose');
 const User = require('./models/user');
 const Task = require('./models/task');
-const mongoose = require('mongoose');
 
 const app = express();
 
@@ -45,6 +44,42 @@ app.get('/users/:id', async (req, res) => {
     }
 })
 
+app.patch('/users/:id', async (req, res) => {
+
+    const updates = Object.keys(req.body);
+    const allowedUpdateds = ['name', 'email', 'password', 'age'];
+    const isValidOperation = updates.every((update) => allowedUpdateds.includes(update));
+
+    if (!isValidOperation) {
+        return res.status(400).send({error: 'Invalid Updates!!'})
+    }
+
+    try {
+        const user = await User.findByIdAndUpdate(req.params.id, req.body, {new : true, runValidators: true})
+
+        if (!user) {
+            return res.status(404).send()
+        }
+        res.send(user)
+    } catch (error) {
+        res.status(400).send(error)
+    }
+})
+
+app.delete('/users/:id', async (req, res) => {
+
+    try {
+        const user = await User.findByIdAndDelete(req.params.id);
+
+        if (!user) {
+            return res.status(404).send()
+        }    
+        res.send(user)
+    } catch (error) {
+        res.status(500).send(error)
+    }
+})
+
 app.post('/tasks', async (req, res) => {
 
     const task = new Task(req.body);
@@ -78,6 +113,43 @@ app.get('/tasks/:id', async (req, res) => {
         res.send(task)
     } catch (error) {
         res.status(500).send(error)
+    }
+})
+
+app.patch('/tasks/:id', async (req, res) => {
+    
+    const updates = Object.keys(req.body)
+    const allowedUpdateds = ['completed', 'description'];
+
+    const isValidOperation = updates.every(update => allowedUpdateds.includes(update));
+
+    if (!isValidOperation) {
+        return res.status(400).send({error: 'Invalid Updates!!'})
+    }
+
+    try {
+        const task = await Task.findByIdAndUpdate(req.params.id, req.body, {new : true, runValidators: true})
+
+        if (!task) {
+            return res.status(404).send('No task updated')
+        }
+        res.send(task)
+    } catch (error) {
+        res.status(400).send(error)
+    }
+})
+
+app.delete('/tasks/:id', async (req, res) => {
+    try {
+        const task = await Task.findByIdAndDelete(req.params.id)
+
+        if (!task) {
+            return res.status(404).send()
+        }
+        res.send(task)
+        
+    } catch (error) {
+        res.status(500).send()
     }
 })
 
